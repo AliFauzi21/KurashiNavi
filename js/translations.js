@@ -157,7 +157,7 @@ const translations = {
     },
     en: {
         servicesPageTitle: "Services - Kurashi Navi",
-        siteTitle: "Kurashi Navi",
+        siteTitle: "KurashiNavi",
         home: "Home",
         services: "Services",
         guide: "Life Guide",

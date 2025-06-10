@@ -12,7 +12,7 @@
     <header>
         <nav class="navbar">
             <div class="logo">
-                <a href="index.php"><h1>くらしナビ</h1></a>
+                <a href="index.php"><h1 data-translate="siteTitle">くらしナビ</h1></a>
             </div>
             <ul class="nav-links">
                 <li><a href="#home" class="active" data-translate="home">ホーム</a></li>
