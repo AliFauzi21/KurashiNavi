@@ -20,9 +20,13 @@ class Contact {
     // Membuat kontak baru
     public function create() {
         $query = "INSERT INTO " . $this->table_name . "
-                (name, email, phone, subject, message)
-                VALUES
-                (:name, :email, :phone, :subject, :message)";
+                SET
+                    name = :name,
+                    email = :email,
+                    phone = :phone,
+                    subject = :subject,
+                    message = :message,
+                    status = 'pending'";
 
         $stmt = $this->conn->prepare($query);
 
@@ -77,18 +81,18 @@ class Contact {
     }
 
     // Update status kontak
-    public function updateStatus() {
+    public function updateStatus($id, $status) {
         $query = "UPDATE " . $this->table_name . "
                 SET status = :status
                 WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
 
-        $this->status = htmlspecialchars(strip_tags($this->status));
-        $this->id = htmlspecialchars(strip_tags($this->id));
+        $status = htmlspecialchars(strip_tags($status));
+        $id = htmlspecialchars(strip_tags($id));
 
-        $stmt->bindParam(":status", $this->status);
-        $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":status", $status);
+        $stmt->bindParam(":id", $id);
 
         if($stmt->execute()) {
             return true;

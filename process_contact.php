@@ -1,6 +1,6 @@
 <?php
 // Include database dan object files
-require_once 'config/database.php';
+require_once 'models/database.php';
 require_once 'models/Contact.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
