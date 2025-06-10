@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Circle -->
+    <circle cx="50" cy="50" r="45" fill="#fff3e0"/>
+    
+    <!-- Torii Gate -->
+    <rect x="30" y="40" width="40" height="5" fill="#8d6e63"/>
+    <rect x="25" y="45" width="50" height="5" fill="#8d6e63"/>
+    <rect x="35" y="30" width="30" height="10" fill="#8d6e63"/>
+    
+    <!-- Cherry Blossom -->
+    <g transform="translate(50, 30)">
+        <!-- Center -->
+        <circle cx="0" cy="0" r="5" fill="#f48fb1"/>
+        <!-- Petals -->
+        <path d="M0 -10 Q5 -5 10 -10 Q5 -15 0 -10" fill="#f48fb1"/>
+        <path d="M10 0 Q5 5 10 10 Q15 5 10 0" fill="#f48fb1"/>
+        <path d="M0 10 Q-5 5 0 10 Q-5 15 0 10" fill="#f48fb1"/>
+        <path d="M-10 0 Q-5 -5 -10 -10 Q-15 -5 -10 0" fill="#f48fb1"/>
+    </g>
+    
+    <!-- Mount Fuji -->
+    <path d="M20 70 L50 40 L80 70 Z" fill="#bdbdbd"/>
+    <path d="M35 70 L50 55 L65 70 Z" fill="#e0e0e0"/>
+</svg> 
