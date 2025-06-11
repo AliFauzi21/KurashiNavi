@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -43,7 +45,7 @@
             </div>
         </section>
 
-        <section class="community-stats">
+        <section class="community-stats" data-aos="fade-up">
             <div class="stat-item" data-aos="zoom-in">
                 <i class="fas fa-users"></i>
                 <h3>1,200+</h3>
@@ -61,8 +63,8 @@
             </div>
         </section>
 
-        <section class="community-events">
-            <div class="section-header">
+        <section class="community-events" data-aos="fade-up">
+            <div class="section-header" data-aos="fade-up">
                 <h2 class="section-title" data-aos="fade-up" data-translate="eventInfo">イベント情報</h2>
                 <div class="event-filters" data-aos="fade-up" data-aos-delay="200">
                     <button class="filter-btn active" data-translate="all">すべて</button>
@@ -71,7 +73,7 @@
                     <button class="filter-btn" data-translate="sports">スポーツ</button>
                 </div>
             </div>
-            <div class="events-grid">
+            <div class="events-grid" data-aos="fade-up">
                 <div class="event-card" data-aos="fade-right">
                     <div class="event-date">
                         <span class="month" data-translate="june">6月</span>
@@ -267,12 +269,16 @@
 
     <script src="js/translations.js"></script>
     <script src="js/main.js"></script>
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        // Inisialisasi AOS
         AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
+            duration: 800,    // Durasi animasi
+            easing: 'ease-in-out',    // Jenis animasi
+            once: true,    // Animasi hanya dijalankan sekali
+            offset: 100,    // Jarak trigger animasi dari bawah viewport
+            delay: 0    // Delay sebelum animasi dimulai
         });
 
         // Event listener untuk filter buttons
