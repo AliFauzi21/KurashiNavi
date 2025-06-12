@@ -51,7 +51,7 @@
                     <div class="contact-info-item">
                         <h3><i class="fas fa-envelope"></i><span data-translate="contactInfo">お問い合わせ先</span></h3>
                         <p data-translate="emailContact">Email: info@kurashinavi.jp</p>
-                        <p data-translate="phoneContact">電話: 03-XXXX-XXXX</p>
+                        <p data-translate="phoneContact">電話: 01-2345-5678</p>
                     </div>
                     <div class="contact-info-item">
                         <h3><i class="fas fa-clock"></i><span data-translate="businessHours">営業時間</span></h3>
@@ -60,8 +60,8 @@
                     </div>
                     <div class="contact-info-item">
                         <h3><i class="fas fa-map-marker-alt"></i><span data-translate="location">所在地</span></h3>
-                        <p data-translate="postalCode">〒XXX-XXXX</p>
-                        <p data-translate="address">東京都XX区XX町X-X-X</p>
+                        <p data-translate="postalCode">〒123-4567</p>
+                        <p data-translate="address">横浜市旭区東希望ヶ丘1-1-1</p>
                     </div>
                 </div>
 
