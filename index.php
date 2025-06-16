@@ -21,12 +21,15 @@
                 <li><a href="community.php" data-translate="community">コミュニティ</a></li>
                 <li><a href="contact.php" data-translate="contact">お問い合わせ</a></li>
             </ul>
-            <div class="language-selector">
-                <select id="languageSelect" onchange="changeLanguage(this.value)">
-                    <option value="ja">日本語</option>
-                    <option value="en">English</option>
-                    <option value="zh">中文</option>
-                </select>
+            <div class="nav-buttons">
+                <a href="login.php" class="login-button" data-translate="login">ログイン</a>
+                <div class="language-selector">
+                    <select id="languageSelect" onchange="changeLanguage(this.value)">
+                        <option value="ja">日本語</option>
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
             </div>
         </nav>
     </header>
@@ -69,7 +72,7 @@
             </div>
             <div class="footer-section">
                 <h3 data-translate="contactUs">お問い合わせ</h3>
-                <p>Email: info@kurashinavi.jp</p>
+                <p>Email: kurashinavi@gmail.com</p>
             </div>
         </div>
         <div class="footer-bottom">

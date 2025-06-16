@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Simpan ke database
         if ($contact->create()) {
             // Kirim email
-            $to = "info@kurashinavi.jp";
+            $to = "kurashinavi@gmail.com";
             $email_subject = "お問い合わせ: " . $contact->subject;
             
             $email_body = "以下の内容でお問い合わせがありました。\n\n";

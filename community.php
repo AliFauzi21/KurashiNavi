@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="<?php echo isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- AOS CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle login form
+            window.toggleLoginForm = function() {
+                const modal = document.getElementById('loginModal');
+                modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('loginModal');
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // Add click event listener to login button
+            const loginBtn = document.querySelector('.login-btn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', toggleLoginForm);
+            }
+        });
+    </script>
 </head>
 <body>
     <header>
@@ -23,12 +46,15 @@
                 <li><a href="community.php" class="active" data-translate="community">コミュニティ</a></li>
                 <li><a href="contact.php" data-translate="contact">お問い合わせ</a></li>
             </ul>
-            <div class="language-selector">
-                <select id="languageSelect" onchange="changeLanguage(this.value)">
-                    <option value="ja">日本語</option>
-                    <option value="en">English</option>
-                    <option value="zh">中文</option>
-                </select>
+            <div class="nav-buttons">
+                <a href="login.php" class="login-button" data-translate="login">ログイン</a>
+                <div class="language-selector">
+                    <select id="languageSelect" onchange="changeLanguage(this.value)">
+                        <option value="ja">日本語</option>
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
             </div>
         </nav>
     </header>
@@ -259,7 +285,7 @@
             </div>
             <div class="footer-section">
                 <h3 data-translate="contactUs">お問い合わせ</h3>
-                <p data-translate="emailContact">Email: info@kurashinavi.jp</p>
+                <p data-translate="emailContact">Email: kurashinavi@gmail.com</p>
             </div>
         </div>
         <div class="footer-bottom">
@@ -301,5 +327,31 @@
             }
         });
     </script>
+
+    <!-- Login Form Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content" data-aos="fade-up">
+            <span class="close" onclick="toggleLoginForm()">&times;</span>
+            <h2><?php echo __('loginTitle'); ?></h2>
+            <?php if(isset($error)): ?>
+                <div class="error-message"><?php echo $error; ?></div>
+            <?php endif; ?>
+            <form action="login.php" method="POST">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> <?php echo __('usernameLabel'); ?></label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> <?php echo __('passwordLabel'); ?></label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" name="login" class="submit-btn"><?php echo __('loginButton'); ?></button>
+            </form>
+            <div class="login-links">
+                <a href="register.php"><?php echo __('registerLink'); ?></a>
+                <a href="forgot-password.php"><?php echo __('forgotPasswordLink'); ?></a>
+            </div>
+        </div>
+    </div>
 </body>
 </html> 
