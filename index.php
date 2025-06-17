@@ -1,5 +1,6 @@
 <?php
-require_once 'includes/config.php';
+session_start();
+require_once 'models/db.php';
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -27,7 +28,7 @@ require_once 'includes/config.php';
             <div class="nav-buttons">
                 <?php if(isset($_SESSION['username'])): ?>
                     <div class="user-info">
-                        <span>ようこそ、<?php echo htmlspecialchars($_SESSION['username']); ?>さん</span>
+                        <span>ようこそ、<?php echo isset($_SESSION['full_name']) ? htmlspecialchars($_SESSION['full_name']) : htmlspecialchars($_SESSION['username']); ?>さん</span>
                         <a href="logout.php" class="logout-button" data-translate="logout">ログアウト</a>
                     </div>
                 <?php else: ?>

@@ -7,9 +7,9 @@ $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
+    $full_name = trim($_POST['full_name']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
-    $full_name = trim($_POST['full_name']);
     
     // Validasi input
     if (empty($username) || empty($email) || empty($password) || empty($full_name)) {
@@ -36,19 +36,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                     
                     // Simpan ke database
-                    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, full_name, status) VALUES (?, ?, ?, ?, 'active')");
-                    $stmt->execute([$username, $email, $hashed_password, $full_name]);
-                    
-                    $success = 'アカウントが正常に作成されました。ログインページに移動します。';
-                    // Redirect ke halaman login setelah 2 detik
-                    echo "<script>
-                        setTimeout(function() {
-                            window.location.href = 'login.php';
-                        }, 2000);
-                    </script>";
+                    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, full_name, role) VALUES (?, ?, ?, ?, 'user')");
+                    if ($stmt->execute([$username, $email, $hashed_password, $full_name])) {
+                        $success = 'アカウントが正常に作成されました。ログインページに移動します。';
+                        // Redirect ke halaman login setelah 2 detik
+                        echo "<script>
+                            setTimeout(function() {
+                                window.location.href = 'login.php';
+                            }, 2000);
+                        </script>";
+                    } else {
+                        $error = '登録中にエラーが発生しました。後でもう一度お試しください。';
+                    }
                 }
             }
         } catch (PDOException $e) {
+            error_log("Registration error: " . $e->getMessage());
             $error = '登録中にエラーが発生しました。後でもう一度お試しください。';
         }
     }

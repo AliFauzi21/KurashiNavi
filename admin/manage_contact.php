@@ -1,40 +1,59 @@
 <?php
-require_once '../includes/config.php';
+session_start();
+require_once '../models/db.php';
 
-// Cek apakah admin sudah login
-if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+// Cek apakah user sudah login sebagai admin
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: login.php');
-    exit;
+    exit();
 }
 
+$error = '';
+$success = '';
+
 // Proses form submission
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if(isset($_POST['action'])) {
-        try {
-            switch($_POST['action']) {
-                case 'reply':
-                    $stmt = $conn->prepare("UPDATE contact_messages SET reply = ?, status = 'replied', replied_at = NOW() WHERE id = ?");
-                    $stmt->execute([$_POST['reply'], $_POST['id']]);
-                    break;
-                case 'delete':
-                    $stmt = $conn->prepare("DELETE FROM contact_messages WHERE id = ?");
-                    $stmt->execute([$_POST['id']]);
-                    break;
-            }
-        } catch(PDOException $e) {
-            $error = 'エラーが発生しました。';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['action'])) {
+        switch ($_POST['action']) {
+            case 'delete':
+                $contact_id = $_POST['contact_id'];
+                try {
+                    $stmt = $pdo->prepare("DELETE FROM contacts WHERE id = ?");
+                    $stmt->execute([$contact_id]);
+                    $success = 'お問い合わせが正常に削除されました。';
+                } catch (PDOException $e) {
+                    error_log("Delete contact error: " . $e->getMessage());
+                    $error = 'エラーが発生しました。後でもう一度お試しください。';
+                }
+                break;
+
+            case 'update_status':
+                $contact_id = $_POST['contact_id'];
+                $status = $_POST['status'];
+                try {
+                    $stmt = $pdo->prepare("UPDATE contacts SET status = ? WHERE id = ?");
+                    $stmt->execute([$status, $contact_id]);
+                    $success = 'ステータスが正常に更新されました。';
+                } catch (PDOException $e) {
+                    error_log("Update contact status error: " . $e->getMessage());
+                    $error = 'エラーが発生しました。後でもう一度お試しください。';
+                }
+                break;
         }
     }
 }
 
-// Ambil data pesan kontak
+// Ambil data contacts
 try {
-    $stmt = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC");
-    $messages = $stmt->fetchAll();
-} catch(PDOException $e) {
-    $error = 'データの取得中にエラーが発生しました。';
+    $stmt = $pdo->query("SELECT * FROM contacts ORDER BY created_at DESC");
+    $contacts = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Fetch contacts error: " . $e->getMessage());
+    $error = 'お問い合わせデータの取得中にエラーが発生しました。';
+    $contacts = [];
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -43,6 +62,7 @@ try {
     <title>お問い合わせ管理 - くらしナビ</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .admin-container {
             display: flex;
@@ -94,16 +114,21 @@ try {
             background: rgba(255,255,255,0.2);
             color: white;
         }
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
         .main-content {
             flex: 1;
             margin-left: 280px;
             padding: 30px;
         }
         .content-header {
-            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 30px;
         }
         .content-header h1 {
             font-size: 28px;
@@ -111,54 +136,155 @@ try {
             color: #1a73e8;
             margin: 0;
         }
-        .messages-table {
+        .contacts-table {
             width: 100%;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            margin-top: 20px;
         }
-        .messages-table th,
-        .messages-table td {
-            padding: 15px 20px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
+        .contacts-table table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .messages-table th {
+        .contacts-table th {
             background: #f8f9fa;
-            font-weight: 600;
             color: #333;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #e0e0e0;
         }
-        .messages-table tr:last-child td {
+        .contacts-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #555;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        .contacts-table tr:last-child td {
             border-bottom: none;
+        }
+        .contacts-table tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+        .status-new {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+        .status-in-progress {
+            background: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ffe0b2;
+        }
+        .status-completed {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
         }
         .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            justify-content: flex-start;
         }
-        .reply-button,
-        .delete-button {
-            padding: 8px 16px;
+        .view-btn, .delete-btn {
+            padding: 8px;
             border: none;
             border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
         }
-        .reply-button {
-            background: #1a73e8;
-            color: white;
+        .view-btn {
+            background: #e3f2fd;
+            color: #1565c0;
         }
-        .reply-button:hover {
-            background: #1557b0;
+        .delete-btn {
+            background: #ffebee;
+            color: #c62828;
         }
-        .delete-button {
-            background: #dc3545;
-            color: white;
+        .view-btn:hover {
+            background: #bbdefb;
+            transform: translateY(-1px);
         }
-        .delete-button:hover {
-            background: #c82333;
+        .delete-btn:hover {
+            background: #ffcdd2;
+            transform: translateY(-1px);
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            padding: 8px 12px 8px 35px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        .search-box input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            outline: none;
+        }
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        .date-column {
+            white-space: nowrap;
+            color: #666;
+            font-size: 13px;
+        }
+        .name-column {
+            font-weight: 500;
+            color: #333;
+        }
+        .email-column {
+            color: #666;
+        }
+        .subject-column {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .modal {
             display: none;
@@ -167,7 +293,7 @@ try {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
         .modal-content {
@@ -177,95 +303,93 @@ try {
             max-width: 600px;
             margin: 50px auto;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
         .modal-header {
             margin-bottom: 20px;
         }
         .modal-header h2 {
-            font-size: 24px;
-            color: #333;
             margin: 0;
+            color: #1a73e8;
+            font-size: 24px;
         }
-        .message-details {
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .contact-details {
             margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
         }
-        .message-details p {
-            margin: 5px 0;
-            color: #555;
+        .contact-details p {
+            margin: 10px 0;
+            line-height: 1.6;
         }
-        .message-details strong {
+        .contact-details strong {
             color: #333;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        .form-control:focus {
-            border-color: #1a73e8;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            display: inline-block;
+            width: 120px;
         }
         .modal-footer {
+            margin-top: 30px;
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 30px;
         }
-        .close-button {
-            padding: 10px 20px;
-            background: #6c757d;
-            color: white;
+        .submit-btn, .cancel-btn {
+            padding: 12px 24px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
-        .close-button:hover {
-            background: #5a6268;
-        }
-        .submit-button {
-            padding: 10px 20px;
+        .submit-btn {
             background: #1a73e8;
             color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
-        .submit-button:hover {
+        .cancel-btn {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .submit-btn:hover {
             background: #1557b0;
         }
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
+        .cancel-btn:hover {
+            background: #e0e0e0;
         }
-        .status-pending {
-            background: #ffc107;
-            color: #000;
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
-        .status-replied {
-            background: #28a745;
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             color: white;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+        }
+        .admin-info span {
+            font-size: 14px;
         }
     </style>
 </head>
@@ -275,17 +399,17 @@ try {
             <div class="sidebar-header">
                 <h2>くらしナビ</h2>
                 <div class="admin-info">
-                    <span>管理者: <?php echo htmlspecialchars($_SESSION['admin_username']); ?></span>
+                    <span>管理者: <?php echo isset($_SESSION['admin_full_name']) ? htmlspecialchars($_SESSION['admin_full_name']) : htmlspecialchars($_SESSION['admin_username']); ?></span>
                 </div>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="dashboard.php">ダッシュボード</a></li>
-                <li><a href="manage_services.php">サービス管理</a></li>
-                <li><a href="manage_guide.php">ガイド管理</a></li>
-                <li><a href="manage_community.php">コミュニティ管理</a></li>
-                <li><a href="manage_contact.php" class="active">お問い合わせ管理</a></li>
-                <li><a href="manage_users.php">ユーザー管理</a></li>
-                <li><a href="logout.php" class="logout-btn">ログアウト</a></li>
+                <li><a href="dashboard.php"><i class="fas fa-home"></i>ダッシュボード</a></li>
+                <li><a href="manage_services.php"><i class="fas fa-concierge-bell"></i>サービス管理</a></li>
+                <li><a href="manage_guide.php"><i class="fas fa-book"></i>ガイド管理</a></li>
+                <li><a href="manage_community.php"><i class="fas fa-comments"></i>コミュニティ管理</a></li>
+                <li><a href="manage_contact.php" class="active"><i class="fas fa-envelope"></i>お問い合わせ管理</a></li>
+                <li><a href="manage_users.php"><i class="fas fa-users"></i>ユーザー管理</a></li>
+                <li><a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i>ログアウト</a></li>
             </ul>
         </div>
         
@@ -293,107 +417,183 @@ try {
             <div class="content-header">
                 <h1>お問い合わせ管理</h1>
             </div>
-            
-            <table class="messages-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>名前</th>
-                        <th>メール</th>
-                        <th>件名</th>
-                        <th>ステータス</th>
-                        <th>受信日時</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach($messages as $message): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($message['id']); ?></td>
-                        <td><?php echo htmlspecialchars($message['name']); ?></td>
-                        <td><?php echo htmlspecialchars($message['email']); ?></td>
-                        <td><?php echo htmlspecialchars($message['subject']); ?></td>
-                        <td>
-                            <span class="status-badge <?php echo $message['status'] === 'pending' ? 'status-pending' : 'status-replied'; ?>">
-                                <?php echo $message['status'] === 'pending' ? '未対応' : '対応済み'; ?>
-                            </span>
-                        </td>
-                        <td><?php echo date('Y/m/d H:i', strtotime($message['created_at'])); ?></td>
-                        <td class="action-buttons">
-                            <button class="reply-button" onclick="showReplyModal(<?php echo htmlspecialchars(json_encode($message)); ?>)">返信</button>
-                            <button class="delete-button" onclick="deleteMessage(<?php echo $message['id']; ?>)">削除</button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+
+            <?php if ($error): ?>
+                <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <?php if ($success): ?>
+                <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+
+            <div class="table-header">
+                <div class="table-title">お問い合わせ一覧</div>
+                <div class="table-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="検索..." onkeyup="searchTable()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="contacts-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>名前</th>
+                            <th>メールアドレス</th>
+                            <th>件名</th>
+                            <th>ステータス</th>
+                            <th>受信日時</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($contacts as $contact): ?>
+                            <tr>
+                                <td class="name-column"><?php echo htmlspecialchars($contact['name']); ?></td>
+                                <td class="email-column"><?php echo htmlspecialchars($contact['email']); ?></td>
+                                <td class="subject-column"><?php echo htmlspecialchars($contact['subject']); ?></td>
+                                <td>
+                                    <span class="status-badge status-<?php echo $contact['status']; ?>">
+                                        <?php 
+                                        switch($contact['status']) {
+                                            case 'new':
+                                                echo '新規';
+                                                break;
+                                            case 'in_progress':
+                                                echo '対応中';
+                                                break;
+                                            case 'completed':
+                                                echo '完了';
+                                                break;
+                                            default:
+                                                echo '新規';
+                                        }
+                                        ?>
+                                    </span>
+                                </td>
+                                <td class="date-column"><?php echo date('Y/m/d H:i', strtotime($contact['created_at'])); ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="view-btn" onclick="openViewModal(<?php echo htmlspecialchars(json_encode($contact)); ?>)" title="詳細を見る">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="delete-btn" onclick="confirmDelete(<?php echo $contact['id']; ?>)" title="削除">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Modal untuk balas pesan -->
-    <div id="replyModal" class="modal">
+    <!-- View Contact Modal -->
+    <div id="viewContactModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeViewModal()">&times;</button>
+            <div class="modal-header">
+                <h2>お問い合わせ詳細</h2>
+            </div>
+            <div class="contact-details">
+                <p><strong>名前:</strong> <span id="view_name"></span></p>
+                <p><strong>メールアドレス:</strong> <span id="view_email"></span></p>
+                <p><strong>件名:</strong> <span id="view_subject"></span></p>
+                <p><strong>メッセージ:</strong></p>
+                <p id="view_message" style="white-space: pre-wrap;"></p>
+                <p><strong>受信日時:</strong> <span id="view_created_at"></span></p>
+            </div>
+            <form method="POST" action="">
+                <input type="hidden" name="action" value="update_status">
+                <input type="hidden" name="contact_id" id="view_contact_id">
+                <div class="form-group">
+                    <label for="status">ステータス</label>
+                    <select id="status" name="status" onchange="this.form.submit()">
+                        <option value="new">新規</option>
+                        <option value="in_progress">対応中</option>
+                        <option value="completed">完了</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>メッセージへの返信</h2>
+                <h2>お問い合わせ削除の確認</h2>
             </div>
-            <form id="replyForm" method="POST">
-                <input type="hidden" name="action" value="reply">
-                <input type="hidden" name="id" id="messageId">
-                
-                <div class="message-details">
-                    <p><strong>送信者:</strong> <span id="senderName"></span></p>
-                    <p><strong>メール:</strong> <span id="senderEmail"></span></p>
-                    <p><strong>件名:</strong> <span id="messageSubject"></span></p>
-                    <p><strong>メッセージ:</strong></p>
-                    <p id="messageContent"></p>
-                </div>
-                
-                <div class="form-group">
-                    <label for="reply">返信内容</label>
-                    <textarea id="reply" name="reply" class="form-control" rows="6" required></textarea>
-                </div>
-                
+            <p>このお問い合わせを削除してもよろしいですか？この操作は元に戻せません。</p>
+            <form method="POST" action="">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="contact_id" id="delete_contact_id">
                 <div class="modal-footer">
-                    <button type="button" class="close-button" onclick="closeModal()">キャンセル</button>
-                    <button type="submit" class="submit-button">送信</button>
+                    <button type="button" class="cancel-btn" onclick="closeDeleteModal()">キャンセル</button>
+                    <button type="submit" class="submit-btn" style="background: #dc3545;">削除</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        function showReplyModal(message) {
-            document.getElementById('messageId').value = message.id;
-            document.getElementById('senderName').textContent = message.name;
-            document.getElementById('senderEmail').textContent = message.email;
-            document.getElementById('messageSubject').textContent = message.subject;
-            document.getElementById('messageContent').textContent = message.message;
-            document.getElementById('reply').value = message.reply || '';
-            document.getElementById('replyModal').style.display = 'block';
+        function openViewModal(contact) {
+            document.getElementById('view_name').textContent = contact.name;
+            document.getElementById('view_email').textContent = contact.email;
+            document.getElementById('view_subject').textContent = contact.subject;
+            document.getElementById('view_message').textContent = contact.message;
+            document.getElementById('view_created_at').textContent = new Date(contact.created_at).toLocaleString('ja-JP');
+            document.getElementById('view_contact_id').value = contact.id;
+            document.getElementById('status').value = contact.status;
+            document.getElementById('viewContactModal').style.display = 'block';
         }
 
-        function closeModal() {
-            document.getElementById('replyModal').style.display = 'none';
+        function closeViewModal() {
+            document.getElementById('viewContactModal').style.display = 'none';
         }
 
-        function deleteMessage(id) {
-            if(confirm('このメッセージを削除してもよろしいですか？')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.innerHTML = `
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="id" value="${id}">
-                `;
-                document.body.appendChild(form);
-                form.submit();
+        function confirmDelete(contactId) {
+            document.getElementById('delete_contact_id').value = contactId;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
             }
         }
 
-        // Tutup modal jika klik di luar modal
-        window.onclick = function(event) {
-            const modal = document.getElementById('replyModal');
-            if (event.target == modal) {
-                closeModal();
+        function searchTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.querySelector('.contacts-table table');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < td.length - 1; j++) { // Exclude the last column (actions)
+                    const cell = td[j];
+                    if (cell) {
+                        const text = cell.textContent || cell.innerText;
+                        if (text.toLowerCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                tr[i].style.display = found ? '' : 'none';
             }
         }
     </script>

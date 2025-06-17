@@ -1,15 +1,16 @@
 <?php
-require_once 'includes/config.php';
+session_start();
+require_once 'models/db.php';
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = clean_input($_POST['username']);
+    $username = trim($_POST['username']);
     $password = $_POST['password'];
 
     try {
         // Cek di tabel admin terlebih dahulu
-        $admin_stmt = $conn->prepare("SELECT * FROM admin WHERE username = ?");
+        $admin_stmt = $pdo->prepare("SELECT * FROM admin WHERE username = ?");
         $admin_stmt->execute([$username]);
         $admin = $admin_stmt->fetch();
 
@@ -22,19 +23,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Jika bukan admin, cek di tabel users
-        $user_stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+        $user_stmt = $pdo->prepare("SELECT id, username, full_name, password FROM users WHERE username = ?");
         $user_stmt->execute([$username]);
         $user = $user_stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
+            // Debug: Tampilkan data user
+            error_log("User data: " . print_r($user, true));
+            
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['full_name'] = $user['full_name'];
+            
+            // Debug: Tampilkan session data
+            error_log("Session data: " . print_r($_SESSION, true));
+            
             header("Location: index.php");
             exit();
         } else {
             $error = 'パスワードが正しくありません。';
         }
     } catch(PDOException $e) {
+        error_log("Login error: " . $e->getMessage());
         $error = 'ログイン処理中にエラーが発生しました。';
     }
 }
