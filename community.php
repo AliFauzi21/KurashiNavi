@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="<?php echo isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja'; ?>">
 <head>
@@ -47,7 +50,14 @@
                 <li><a href="contact.php" data-translate="contact">お問い合わせ</a></li>
             </ul>
             <div class="nav-buttons">
-                <a href="login.php" class="login-button" data-translate="login">ログイン</a>
+                <?php if(isset($_SESSION['username'])): ?>
+                    <div class="user-info">
+                        <span>ようこそ、<?php echo htmlspecialchars($_SESSION['username']); ?>さん</span>
+                        <a href="logout.php" class="logout-button">ログアウト</a>
+                    </div>
+                <?php else: ?>
+                    <a href="login.php" class="login-button" data-translate="login">ログイン</a>
+                <?php endif; ?>
                 <div class="language-selector">
                     <select id="languageSelect" onchange="changeLanguage(this.value)">
                         <option value="ja">日本語</option>
