@@ -1,31 +1,41 @@
 <?php
-session_start();
-require_once 'models/db_connect.php';
+require_once 'includes/config.php';
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
+    $username = clean_input($_POST['username']);
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    try {
+        // Cek di tabel admin terlebih dahulu
+        $admin_stmt = $conn->prepare("SELECT * FROM admin WHERE username = ?");
+        $admin_stmt->execute([$username]);
+        $admin = $admin_stmt->fetch();
 
-    if ($result->num_rows == 1) {
-        $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
+        if ($admin && password_verify($password, $admin['password'])) {
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_id'] = $admin['id'];
+            $_SESSION['admin_username'] = $admin['username'];
+            header("Location: admin/dashboard.php");
+            exit();
+        }
+
+        // Jika bukan admin, cek di tabel users
+        $user_stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+        $user_stmt->execute([$username]);
+        $user = $user_stmt->fetch();
+
+        if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             header("Location: index.php");
             exit();
         } else {
-            $error = 'Password salah';
+            $error = 'パスワードが正しくありません。';
         }
-    } else {
-        $error = 'Username tidak ditemukan';
+    } catch(PDOException $e) {
+        $error = 'ログイン処理中にエラーが発生しました。';
     }
 }
 ?>
