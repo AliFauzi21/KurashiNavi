@@ -1070,9 +1070,30 @@ footer {
     padding-top: 80px;
 }
 
+.services-hero-content {
+    width: 100%;
+    padding: 32px 0 18px 0;
+    text-align: center;
+    margin-bottom: 36px;
+    background: none;
+    box-shadow: none;
+    transition: none;
+}
+
 .services-hero-content h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-color, #1a73e8);
+    margin-bottom: 10px;
+    text-shadow: none;
+    letter-spacing: 0.5px;
+}
+
+.services-hero-content p {
+    color: #555;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 0;
 }
 
 .services-detail {
@@ -1203,71 +1224,78 @@ footer {
 }
 
 .guide-container {
-    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 900px;
     margin: 0 auto;
+    padding: 24px 8px;
 }
 
 .guide-section {
-    background-color: var(--white);
-    border-radius: 15px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     display: flex;
-    gap: 2rem;
+    gap: 32px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    padding: 32px 24px;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .guide-icon {
-    flex: 0 0 150px;
-    text-align: center;
+    flex: 0 0 80px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 80px;
 }
 
 .guide-icon img {
-    width: 100px;
-    height: 100px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
 }
 
 .guide-text {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 220px;
 }
 
 .guide-text h2 {
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    color: #1a73e8;
+    word-break: break-word;
 }
 
 .guide-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.guide-details:last-child {
+    border-bottom: none;
 }
 
 .guide-details h3 {
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+    color: #333;
+    word-break: break-word;
 }
 
-.guide-details ul {
-    list-style: none;
+.guide-detail-item {
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.guide-detail-item p {
     margin: 0;
-    padding: 0;
-}
-
-.guide-details ul li {
-    margin-bottom: 0.5rem;
-    padding-left: 1.5rem;
-    position: relative;
-}
-
-.guide-details ul li:before {
-    content: "•";
-    color: var(--primary-color);
-    position: absolute;
-    left: 0;
+    color: #444;
+    line-height: 1.7;
+    white-space: pre-line;
 }
 
 .guide-tips {
@@ -1438,12 +1466,13 @@ footer {
 
     .guide-section {
         flex-direction: column;
-        text-align: center;
+        gap: 16px;
+        padding: 18px 8px;
     }
 
     .guide-icon {
-        flex: 0 0 auto;
-        margin-bottom: 1rem;
+        justify-content: flex-start;
+        margin-bottom: 8px;
     }
 
     .guide-details {
@@ -1817,4 +1846,280 @@ footer {
     color: white;
     border-color: #dc3545;
     transform: translateY(-1px);
+}
+
+/* Additional styles for dynamic services */
+.service-description {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.default-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 50%;
+    color: #6c757d;
+}
+
+.no-services {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.no-services h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* --- GUIDES PAGE MODERN CARD STYLE --- */
+.guides-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px 60px 20px;
+}
+.guides-hero-content {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.guides-hero-content h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary-color, #1a73e8);
+  margin-bottom: 10px;
+}
+.guides-hero-content p {
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 0;
+}
+.guides-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.guide-card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 40px 36px 36px 36px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  border: none;
+  overflow: hidden;
+}
+.guide-card:hover {
+  box-shadow: 0 6px 24px rgba(26,115,232,0.13);
+  transform: translateY(-4px) scale(1.01);
+}
+.guide-card .guide-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #e3f0ff;
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+}
+.guide-card .guide-icon {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7fa;
+  border-radius: 50%;
+  margin-right: 40px;
+  margin-bottom: 0;
+}
+.guide-card .guide-icon img {
+  width: 60px;
+  height: 60px;
+}
+.guide-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.guide-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1a73e8;
+  margin-bottom: 8px;
+  letter-spacing: 0.2px;
+}
+.guide-description {
+  font-size: 1.05rem;
+  color: #555;
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+.guide-meta {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  font-size: 0.99rem;
+  color: #888;
+  margin-bottom: 18px;
+  margin-top: 0;
+}
+.guide-meta .meta-badge {
+  background: #e3f0ff;
+  color: var(--primary-color);
+  font-size: 0.97rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 14px;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.guide-meta .meta-date,
+.guide-meta .meta-count {
+  color: #888;
+  font-size: 0.93rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.guide-items {
+  list-style: none;
+  padding: 0 0 0 0;
+  margin: 0 0 12px 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-left: 4px solid #e3f0ff;
+}
+.guide-items li {
+  color: #333;
+  padding-left: 32px;
+  position: relative;
+  margin-bottom: 12px;
+  font-size: 0.97rem;
+  font-weight: 500;
+  border-radius: 0;
+  background: none;
+  transition: none;
+}
+.guide-items li:last-child {
+  margin-bottom: 0;
+}
+.guide-items li:before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 13px;
+  height: 13px;
+  background: #e3f0ff;
+  border: 2px solid #1a73e8;
+  border-radius: 50%;
+  box-sizing: border-box;
+  margin-right: 10px;
+}
+.guide-item-title {
+  font-size: 1.07rem;
+  font-weight: 700;
+  color: #1976d2;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 2px;
+  margin-left: 0;
+}
+.guide-item-title .fa-info-circle {
+  display: none;
+}
+.guide-item-content {
+  color: #444;
+  font-size: 0.98rem;
+  margin-left: 0;
+  margin-bottom: 8px;
+  line-height: 1.7;
+  white-space: pre-line;
+  font-weight: 400;
+}
+
+/* --- HERO SECTION STYLE KHUSUS GUIDE (SAMA SEDERHANA DENGAN SERVICES) --- */
+.guide-hero-section {
+  width: 100%;
+  padding: 32px 0 18px 0;
+  text-align: center;
+  margin-bottom: 36px;
+  background: none;
+  box-shadow: none;
+  transition: none;
+}
+.guide-hero-content h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary-color, #1a73e8);
+  margin-bottom: 10px;
+  text-shadow: none;
+  letter-spacing: 0.5px;
+}
+.guide-hero-content p {
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 0;
+}
+@media (max-width: 700px) {
+  .guide-hero-section {
+    padding: 18px 0 12px 0;
+    margin-bottom: 18px;
+  }
+  .guide-hero-content h1 {
+    font-size: 1.4rem;
+  }
+}
+
+/* --- KEMBALIKAN HERO SERVICES KE STYLE ASLI --- */
+.services-hero-content {
+  width: 100%;
+  padding: 32px 0 18px 0;
+  text-align: center;
+  margin-bottom: 36px;
+  background: none;
+  box-shadow: none;
+  transition: none;
+}
+.services-hero-content h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary-color, #1a73e8);
+  margin-bottom: 10px;
+  text-shadow: none;
+  letter-spacing: 0.5px;
+}
+.services-hero-content p {
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 0;
+}
+
+/* --- HERO SECTION TEXT COLOR PUTIH UNTUK SERVICES DAN GUIDE --- */
+.services-hero-content h1,
+.services-hero-content p {
+  color: #fff !important;
 }

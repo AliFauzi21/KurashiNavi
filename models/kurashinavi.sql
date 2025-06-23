@@ -126,10 +126,24 @@ CREATE TABLE `services` (
   `id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
+  `icon` varchar(255) DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
+  `items` text DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `order_number` int(11) DEFAULT 0,
   `status` enum('active','inactive') DEFAULT 'active',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- テーブルのデータのダンプ `services`
+--
+
+INSERT INTO `services` (`id`, `title`, `description`, `icon`, `category`, `items`, `link`, `order_number`, `status`, `created_at`, `updated_at`) VALUES
+(1, '生活ガイド', '日本での生活に必要な情報を提供します', 'images/life-guide-icon.svg', 'main', '["住居探しのサポート", "医療機関の案内", "教育機関の情報提供", "行政手続きのサポート"]', 'guide.php', 1, 'active', '2025-01-01 00:00:00', '2025-01-01 00:00:00'),
+(2, '仕事サポート', '就職活動から職場でのサポートまで', 'images/work-support-icon.svg', 'main', '["就職活動支援", "ビザ申請サポート", "職場でのコミュニケーション支援", "キャリアカウンセリング"]', '#contact', 2, 'active', '2025-01-01 00:00:00', '2025-01-01 00:00:00'),
+(3, 'コミュニティ', '地域交流と文化活動のサポート', 'images/community-icon.svg', 'main', '["言語交換グループ", "文化活動グループ", "スポーツ交流グループ", "地域交流イベント"]', 'community.php', 3, 'active', '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 
 -- --------------------------------------------------------
 

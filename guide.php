@@ -1,5 +1,39 @@
 <?php
 session_start();
+require_once 'models/Guide.php';
+require_once 'models/database.php';
+
+// Koneksi database
+$db = new Database();
+$conn = $db->getConnection();
+
+// Ambil data guide aktif
+$guideModel = new Guide($conn);
+$stmt = $guideModel->readAll(true);
+$guides = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Kelompokkan guide berdasarkan kategori
+$groupedGuides = [];
+foreach ($guides as $guide) {
+    $groupedGuides[$guide['category']][] = $guide;
+}
+
+$categoryNames = [
+    'housing' => '住居',
+    'healthcare' => '医療',
+    'education' => '教育',
+    'work' => '仕事',
+    'daily_life' => '日常生活',
+    'admin' => '行政手続き',
+];
+$categoryDescriptions = [
+    'housing' => '住居探しのサポートや必要な書類など、日本での住まいに関する情報をまとめています。',
+    'healthcare' => '医療機関の利用方法や健康保険、緊急時の対応など、健康に関する情報を掲載。',
+    'education' => '学校の種類や入学手続き、教育に関するポイントを紹介します。',
+    'work' => '仕事探しや職場でのサポート、ビザ申請などに役立つ情報。',
+    'daily_life' => '日常生活に役立つヒントや便利な情報をまとめています。',
+    'admin' => '住民登録や各種届出、行政手続きの流れや注意点を解説。',
+];
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -10,6 +44,7 @@ session_start();
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <header>
@@ -45,150 +80,54 @@ session_start();
     </header>
 
     <main>
-        <section class="guide-hero">
-            <div class="guide-hero-content" data-aos="fade-up">
-                <h1 data-aos="fade-up" data-translate="guideTitle">生活ガイド</h1>
-                <p data-aos="fade-up" data-aos-delay="300" data-translate="guideSubtitle">日本での生活に必要な情報をまとめました</p>
-                <div class="guide-search" data-aos="fade-up" data-aos-delay="500">
-                    <input type="text" data-translate-placeholder="searchPlaceholder" placeholder="情報を検索...">
-                    <button type="button" data-translate="searchButton">検索</button>
-                </div>
+        <section class="services-hero">
+            <div class="services-hero-content">
+                <h1 data-translate="guideTitle">生活ガイド</h1>
+                <p data-translate="guideSubtitle">日本での生活に必要な情報をまとめました</p>
             </div>
         </section>
-
-        <section class="guide-content">
-            <div class="guide-container">
-                <!-- 住居探し -->
-                <div class="guide-section" data-aos="fade-right">
+        <div class="guides-main">
+            <div class="guides-grid">
+                <?php
+                $categoryIcons = [
+                    'housing' => 'images/life-guide-icon.svg',
+                    'healthcare' => 'images/medical-icon.svg',
+                    'education' => 'images/education-icon.svg',
+                    'work' => 'images/work-support-icon.svg',
+                    'daily_life' => 'images/culture-icon.svg',
+                    'admin' => 'images/admin-icon.svg',
+                ];
+                foreach ($groupedGuides as $category => $guidesList):
+                ?>
+                <div class="guide-card" data-aos="fade-up">
+                    <div class="guide-badge"><?php echo $categoryNames[$category] ?? 'カテゴリ'; ?></div>
                     <div class="guide-icon">
-                        <img src="images/life-guide-icon.svg" alt="住居探し" data-translate-alt="housingSearchAlt">
+                        <img src="<?php echo isset($categoryIcons[$category]) ? $categoryIcons[$category] : 'images/life-guide-icon.svg'; ?>" alt="<?php echo $categoryNames[$category] ?? $category; ?>">
                     </div>
-                    <div class="guide-text">
-                        <h2 data-translate="housingSearchTitle">住居探し</h2>
-                        <div class="guide-details">
-                            <div class="guide-detail-item">
-                                <h3 data-translate="requiredDocuments">必要な書類</h3>
-                                <ul>
-                                    <li data-translate="documents.0">在留カード</li>
-                                    <li data-translate="documents.1">パスポート</li>
-                                    <li data-translate="documents.2">収入証明書</li>
-                                    <li data-translate="documents.3">連帯保証人</li>
-                                </ul>
-                            </div>
-                            <div class="guide-detail-item">
-                                <h3 data-translate="costs">費用</h3>
-                                <ul>
-                                    <li data-translate="costs.0">敷金（2ヶ月分）</li>
-                                    <li data-translate="costs.1">礼金（1-2ヶ月分）</li>
-                                    <li data-translate="costs.2">仲介手数料（1ヶ月分）</li>
-                                    <li data-translate="costs.3">火災保険</li>
-                                </ul>
-                            </div>
+                    <div class="guide-card-info">
+                        <div class="guide-title"><?php echo $categoryNames[$category] ?? $category; ?></div>
+                        <?php if (!empty($categoryDescriptions[$category])): ?>
+                            <div class="guide-description"><?php echo $categoryDescriptions[$category]; ?></div>
+                        <?php endif; ?>
+                        <div class="guide-meta">
+                            <span class="meta-badge"><i class="fas fa-tag"></i> <?php echo $categoryNames[$category] ?? $category; ?></span>
+                            <?php $firstGuide = $guidesList[0]; ?>
+                            <span class="meta-badge meta-date"><i class="fas fa-clock"></i> <?php echo date('Y-m-d', strtotime($firstGuide['created_at'])); ?></span>
+                            <span class="meta-count"><i class="fas fa-list"></i> <?php echo count($guidesList); ?> 件</span>
                         </div>
-                        <div class="guide-tips-box">
-                            <h4 data-translate="usefulInfo">便利な情報</h4>
-                            <p data-translate="housingTips">物件探しは、駅からの距離や周辺施設も確認しましょう。また、契約前に内見することをお勧めします。</p>
-                        </div>
+                        <ul class="guide-items">
+                            <?php foreach ($guidesList as $guide): ?>
+                            <li>
+                                <span class="guide-item-title"><i class="fas fa-info-circle"></i> <?php echo htmlspecialchars($guide['title']); ?></span>
+                                <div class="guide-item-content"><?php echo nl2br(htmlspecialchars($guide['content'])); ?></div>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- 医療機関 -->
-                <div class="guide-section" data-aos="fade-right" data-aos-delay="200">
-                    <div class="guide-icon">
-                        <img src="images/medical-icon.svg" alt="医療機関" data-translate-alt="medicalAlt">
-                    </div>
-                    <div class="guide-text">
-                        <h2 data-translate="medicalTitle">医療機関</h2>
-                        <div class="guide-details">
-                            <div class="guide-detail-item">
-                                <h3 data-translate="healthInsurance">健康保険</h3>
-                                <ul>
-                                    <li data-translate="insurance.0">国民健康保険</li>
-                                    <li data-translate="insurance.1">社会保険</li>
-                                    <li data-translate="insurance.2">保険証の取得方法</li>
-                                </ul>
-                            </div>
-                            <div class="guide-detail-item">
-                                <h3 data-translate="hospitalUsage">病院の利用方法</h3>
-                                <ul>
-                                    <li data-translate="hospital.0">予約方法</li>
-                                    <li data-translate="hospital.1">診察料金</li>
-                                    <li data-translate="hospital.2">薬の処方</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="guide-tips-box">
-                            <h4 data-translate="emergencyInfo">緊急時の対応</h4>
-                            <p data-translate="emergencyTips">夜間や休日の急病の場合は、救急病院を利用できます。救急車は119番に電話してください。</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 教育機関 -->
-                <div class="guide-section" data-aos="fade-right" data-aos-delay="400">
-                    <div class="guide-icon">
-                        <img src="images/education-icon.svg" alt="教育機関" data-translate-alt="educationAlt">
-                    </div>
-                    <div class="guide-text">
-                        <h2 data-translate="educationTitle">教育機関</h2>
-                        <div class="guide-details">
-                            <div class="guide-detail-item">
-                                <h3 data-translate="schoolTypes">学校の種類</h3>
-                                <ul>
-                                    <li data-translate="schools.0">公立学校</li>
-                                    <li data-translate="schools.1">私立学校</li>
-                                    <li data-translate="schools.2">インターナショナルスクール</li>
-                                </ul>
-                            </div>
-                            <div class="guide-detail-item">
-                                <h3 data-translate="enrollment">入学手続き</h3>
-                                <ul>
-                                    <li data-translate="enrollment.0">必要な書類</li>
-                                    <li data-translate="enrollment.1">入学試験</li>
-                                    <li data-translate="enrollment.2">学費</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="guide-tips-box">
-                            <h4 data-translate="schoolSelection">学校選びのポイント</h4>
-                            <p data-translate="schoolTips">学校の教育方針、通学時間、学費、言語サポート体制などを確認しましょう。</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 行政手続き -->
-                <div class="guide-section" data-aos="fade-right" data-aos-delay="600">
-                    <div class="guide-icon">
-                        <img src="images/admin-icon.svg" alt="行政手続き" data-translate-alt="adminAlt">
-                    </div>
-                    <div class="guide-text">
-                        <h2 data-translate="adminTitle">行政手続き</h2>
-                        <div class="guide-details">
-                            <div class="guide-detail-item">
-                                <h3 data-translate="residenceRegistration">住民登録</h3>
-                                <ul>
-                                    <li data-translate="registration.0">転入届</li>
-                                    <li data-translate="registration.1">マイナンバー</li>
-                                    <li data-translate="registration.2">住民票</li>
-                                </ul>
-                            </div>
-                            <div class="guide-detail-item">
-                                <h3 data-translate="variousNotifications">各種届出</h3>
-                                <ul>
-                                    <li data-translate="notifications.0">婚姻届</li>
-                                    <li data-translate="notifications.1">出生届</li>
-                                    <li data-translate="notifications.2">死亡届</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="guide-tips-box">
-                            <h4 data-translate="procedureNotes">手続きの注意点</h4>
-                            <p data-translate="procedureTips">手続きには本人確認書類が必要です。また、期限がある届出は早めに準備しましょう。</p>
-                        </div>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
-        </section>
+        </div>
 
         <section class="guide-tips">
             <h2 data-aos="fade-up" data-translate="lifeTips">生活のヒント</h2>
