@@ -7,6 +7,6 @@ unset($_SESSION['admin_id']);
 unset($_SESSION['admin_username']);
 unset($_SESSION['admin_full_name']);
 
-// Redirect ke halaman login admin
-header('Location: login.php');
+// Redirect ke halaman login user
+header('Location: ../login.php');
 exit; 
