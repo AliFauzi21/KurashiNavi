@@ -9,21 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
 
     try {
-        // Cek di tabel admin terlebih dahulu
-        $admin_stmt = $pdo->prepare("SELECT * FROM admin WHERE username = ?");
-        $admin_stmt->execute([$username]);
-        $admin = $admin_stmt->fetch();
-
-        if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION['admin_logged_in'] = true;
-            $_SESSION['admin_id'] = $admin['id'];
-            $_SESSION['admin_username'] = $admin['username'];
-            header("Location: admin/dashboard.php");
-            exit();
-        }
-
-        // Jika bukan admin, cek di tabel users
-        $user_stmt = $pdo->prepare("SELECT id, username, full_name, password FROM users WHERE username = ?");
+        // Cek di tabel users saja
+        $user_stmt = $pdo->prepare("SELECT id, username, full_name, password, role FROM users WHERE username = ?");
         $user_stmt->execute([$username]);
         $user = $user_stmt->fetch();
 
@@ -34,11 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['full_name'] = $user['full_name'];
+            $_SESSION['role'] = $user['role'];
             
             // Debug: Tampilkan session data
             error_log("Session data: " . print_r($_SESSION, true));
             
-            header("Location: index.php");
+            if ($user['role'] === 'admin') {
+                header("Location: admin/dashboard.php");
+            } else {
+                header("Location: index.php");
+            }
             exit();
         } else {
             $error = 'パスワードが正しくありません。';
