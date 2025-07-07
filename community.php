@@ -1,5 +1,21 @@
 <?php
 session_start();
+require_once 'models/db.php';
+
+// Ambil daftar event/group yang sudah diikuti user jika sudah login
+$user_joined_events = [];
+$user_joined_groups = [];
+if (isset($_SESSION['user_id'])) {
+    $uid = $_SESSION['user_id'];
+    // Event
+    $stmt = $pdo->prepare('SELECT event_id FROM event_participants WHERE user_id = ?');
+    $stmt->execute([$uid]);
+    $user_joined_events = array_column($stmt->fetchAll(), 'event_id');
+    // Group
+    $stmt = $pdo->prepare('SELECT group_id FROM group_members WHERE user_id = ?');
+    $stmt->execute([$uid]);
+    $user_joined_groups = array_column($stmt->fetchAll(), 'group_id');
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja'; ?>">
@@ -124,9 +140,15 @@ session_start();
                         <p class="event-time"><i class="far fa-clock"></i> <span data-translate="eventTime">14:00 - 16:00</span></p>
                         <p class="event-location"><i class="fas fa-map-marker-alt"></i> <span data-translate="shinjukuCenter">新宿区文化センター</span></p>
                         <p class="event-description" data-translate="japaneseExchangeDesc">日本語を練習しながら、新しい友達を作りましょう。初心者も大歓迎です。</p>
-                        <div class="event-footer">
-                            <a href="#" class="event-button" data-translate="join">参加する</a>
-                        </div>
+                        <?php if (in_array(1, $user_joined_events)): ?>
+                            <button class="event-button" disabled>参加済み</button>
+                        <?php else: ?>
+                            <form action="process_join.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="type" value="event">
+                                <input type="hidden" name="id" value="1">
+                                <button type="submit" class="event-button" data-translate="join">参加する</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -144,9 +166,15 @@ session_start();
                         <p class="event-time"><i class="far fa-clock"></i> <span data-translate="eventTime2">10:00 - 15:00</span></p>
                         <p class="event-location"><i class="fas fa-map-marker-alt"></i> <span data-translate="asakusaCenter">浅草文化センター</span></p>
                         <p class="event-description" data-translate="culturalEventDesc">茶道、書道、着物体験など、日本の伝統文化を体験できます。</p>
-                        <div class="event-footer">
-                            <a href="#" class="event-button" data-translate="join">参加する</a>
-                        </div>
+                        <?php if (in_array(2, $user_joined_events)): ?>
+                            <button class="event-button" disabled>参加済み</button>
+                        <?php else: ?>
+                            <form action="process_join.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="type" value="event">
+                                <input type="hidden" name="id" value="2">
+                                <button type="submit" class="event-button" data-translate="join">参加する</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -164,9 +192,15 @@ session_start();
                         <p class="event-time"><i class="far fa-clock"></i> <span data-translate="eventTime3">18:00 - 20:00</span></p>
                         <p class="event-location"><i class="fas fa-map-marker-alt"></i> <span data-translate="shibuyaCenter">渋谷区民会館</span></p>
                         <p class="event-description" data-translate="communityPartyDesc">地域の日本人と外国人との交流パーティー。料理の持ち寄りも歓迎です。</p>
-                        <div class="event-footer">
-                            <a href="#" class="event-button" data-translate="join">参加する</a>
-                        </div>
+                        <?php if (in_array(3, $user_joined_events)): ?>
+                            <button class="event-button" disabled>参加済み</button>
+                        <?php else: ?>
+                            <form action="process_join.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="type" value="event">
+                                <input type="hidden" name="id" value="3">
+                                <button type="submit" class="event-button" data-translate="join">参加する</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -191,7 +225,15 @@ session_start();
                             <span data-translate="english">英語</span>
                             <span data-translate="beginnersWelcome">初心者歓迎</span>
                         </div>
-                        <a href="#" class="group-button" data-translate="join">参加する</a>
+                        <?php if (in_array(1, $user_joined_groups)): ?>
+                            <button class="group-button" disabled>参加済み</button>
+                        <?php else: ?>
+                            <form action="process_join.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="type" value="group">
+                                <input type="hidden" name="id" value="1">
+                                <button type="submit" class="group-button" data-translate="join">参加する</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -211,7 +253,15 @@ session_start();
                             <span data-translate="calligraphy">書道</span>
                             <span data-translate="kimono">着物</span>
                         </div>
-                        <a href="#" class="group-button" data-translate="join">参加する</a>
+                        <?php if (in_array(2, $user_joined_groups)): ?>
+                            <button class="group-button" disabled>参加済み</button>
+                        <?php else: ?>
+                            <form action="process_join.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="type" value="group">
+                                <input type="hidden" name="id" value="2">
+                                <button type="submit" class="group-button" data-translate="join">参加する</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -231,7 +281,15 @@ session_start();
                             <span data-translate="tennis">テニス</span>
                             <span data-translate="basketball">バスケ</span>
                         </div>
-                        <a href="#" class="group-button" data-translate="join">参加する</a>
+                        <?php if (in_array(3, $user_joined_groups)): ?>
+                            <button class="group-button" disabled>参加済み</button>
+                        <?php else: ?>
+                            <form action="process_join.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="type" value="group">
+                                <input type="hidden" name="id" value="3">
+                                <button type="submit" class="group-button" data-translate="join">参加する</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -363,5 +421,11 @@ session_start();
             </div>
         </div>
     </div>
+
+    <?php if (isset($_SESSION['join_message'])): ?>
+        <div class="alert alert-info" style="margin: 20px; text-align:center;">
+            <?php echo $_SESSION['join_message']; unset($_SESSION['join_message']); ?>
+        </div>
+    <?php endif; ?>
 </body>
 </html> 

@@ -115,14 +115,16 @@ $categoryDescriptions = [
                             <span class="meta-badge meta-date"><i class="fas fa-clock"></i> <?php echo date('Y-m-d', strtotime($firstGuide['created_at'])); ?></span>
                             <span class="meta-count"><i class="fas fa-list"></i> <?php echo count($guidesList); ?> 件</span>
                         </div>
-                        <ul class="guide-items">
-                            <?php foreach ($guidesList as $guide): ?>
-                            <li>
-                                <span class="guide-item-title"><i class="fas fa-info-circle"></i> <?php echo htmlspecialchars($guide['title']); ?></span>
-                                <div class="guide-item-content"><?php echo nl2br(htmlspecialchars($guide['content'])); ?></div>
-                            </li>
-                            <?php endforeach; ?>
-                        </ul>
+                        <div class="guide-info-box">
+                            <ul class="guide-items">
+                                <?php foreach ($guidesList as $guide): ?>
+                                <li>
+                                    <span class="guide-item-title"><i class="fas fa-info-circle"></i> <?php echo htmlspecialchars($guide['title']); ?></span>
+                                    <div class="guide-item-content"><?php echo nl2br(htmlspecialchars($guide['content'])); ?></div>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <?php endforeach; ?>

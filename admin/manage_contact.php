@@ -397,19 +397,21 @@ try {
     <div class="admin-container">
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2>くらしナビ</h2>
+                <h2>管理者パネル</h2>
+                <?php if (isset($_SESSION['admin_username'])): ?>
                 <div class="admin-info">
-                    <span>管理者: <?php echo isset($_SESSION['admin_full_name']) ? htmlspecialchars($_SESSION['admin_full_name']) : htmlspecialchars($_SESSION['admin_username']); ?></span>
+                    <span><i class="fas fa-user-shield"></i> <?php echo htmlspecialchars($_SESSION['admin_username']); ?></span>
                 </div>
+                <?php endif; ?>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="dashboard.php"><i class="fas fa-home"></i>ダッシュボード</a></li>
-                <li><a href="manage_services.php"><i class="fas fa-concierge-bell"></i>サービス管理</a></li>
-                <li><a href="manage_guide.php"><i class="fas fa-book"></i>ガイド管理</a></li>
-                <li><a href="manage_community.php"><i class="fas fa-comments"></i>コミュニティ管理</a></li>
-                <li><a href="manage_contact.php" class="active"><i class="fas fa-envelope"></i>お問い合わせ管理</a></li>
-                <li><a href="manage_users.php"><i class="fas fa-users"></i>ユーザー管理</a></li>
-                <li><a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i>ログアウト</a></li>
+                <li><a href="dashboard.php" class="<?php echo basename($_SERVER['PHP_SELF'])=='dashboard.php'?'active':''; ?>"><i class="fas fa-tachometer-alt"></i> ダッシュボード</a></li>
+                <li><a href="manage_users.php" class="<?php echo basename($_SERVER['PHP_SELF'])=='manage_users.php'?'active':''; ?>"><i class="fas fa-users"></i> ユーザー管理</a></li>
+                <li><a href="manage_services.php" class="<?php echo basename($_SERVER['PHP_SELF'])=='manage_services.php'?'active':''; ?>"><i class="fas fa-cogs"></i> サービス管理</a></li>
+                <li><a href="manage_guide.php" class="<?php echo basename($_SERVER['PHP_SELF'])=='manage_guide.php'?'active':''; ?>"><i class="fas fa-book"></i> ガイド管理</a></li>
+                <li><a href="manage_community.php" class="<?php echo basename($_SERVER['PHP_SELF'])=='manage_community.php'?'active':''; ?>"><i class="fas fa-comments"></i> コミュニティ管理</a></li>
+                <li><a href="manage_contact.php" class="<?php echo basename($_SERVER['PHP_SELF'])=='manage_contact.php'?'active':''; ?>"><i class="fas fa-envelope"></i> お問い合わせ管理</a></li>
+                <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> ログアウト</a></li>
             </ul>
         </div>
         
