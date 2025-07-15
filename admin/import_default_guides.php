@@ -3,6 +3,15 @@
 require_once '../models/database.php';
 require_once '../models/Guide.php';
 
+session_start();
+require_once '../models/db.php';
+
+// Cek apakah admin sudah login
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../login.php');
+    exit;
+}
+
 $db = new Database();
 $conn = $db->getConnection();
 $guideModel = new Guide($conn);

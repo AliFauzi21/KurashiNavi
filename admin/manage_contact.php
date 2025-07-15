@@ -2,10 +2,10 @@
 session_start();
 require_once '../models/db.php';
 
-// Cek apakah user sudah login sebagai admin
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
-    exit();
+// Cek apakah admin sudah login
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../login.php');
+    exit;
 }
 
 $error = '';

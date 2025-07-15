@@ -3,7 +3,7 @@ session_start();
 require_once '../models/db.php';
 
 // Cek apakah admin sudah login
-if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
