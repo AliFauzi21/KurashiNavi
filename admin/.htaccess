@@ -1,0 +1,36 @@
+# Protect admin directory
+RewriteEngine On
+
+# Redirect to login if not authenticated
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ ../login.php [L,R=302]
+
+# Block direct access to PHP files without proper authentication
+<Files "*.php">
+    Order Deny,Allow
+    Deny from all
+    Allow from 127.0.0.1
+    Allow from ::1
+</Files>
+
+# Allow access to specific admin files only through proper authentication
+<Files "dashboard.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "manage_*.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "import_*.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "logout.php">
+    Order Allow,Deny
+    Allow from all
+</Files> 

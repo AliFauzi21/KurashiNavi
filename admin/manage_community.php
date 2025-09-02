@@ -1,13 +1,9 @@
 <?php
-session_start();
 require_once '../models/db.php';
 require_once '../models/Community.php';
+require_once 'auth_check.php';
 
-// Cek apakah admin sudah login
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../login.php');
-    exit;
-}
+// Sistem keamanan sudah otomatis berjalan dari auth_check.php
 
 $community = new Community($pdo);
 

@@ -4,6 +4,33 @@ require_once 'models/db.php';
 
 $error = '';
 
+// Handle error messages from admin redirects
+$error_message = '';
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'not_logged_in':
+            $error_message = 'ログインが必要です。';
+            break;
+        case 'not_admin':
+            $error_message = '管理者権限が必要です。';
+            break;
+        case 'session_expired':
+            $error_message = 'セッションが期限切れです。再度ログインしてください。';
+            break;
+        case 'invalid_token':
+            $error_message = 'セキュリティトークンが無効です。';
+            break;
+        case 'invalid_ip':
+            $error_message = 'アクセスが許可されていません。';
+            break;
+        case 'invalid_user_agent':
+            $error_message = '無効なユーザーエージェントです。';
+            break;
+        default:
+            $error_message = '';
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
@@ -324,6 +351,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <h3 data-translate="loginFormTitle">ログイン</h3>
                     <?php if ($error): ?>
                         <div class="error-message"><?php echo $error; ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if ($error_message): ?>
+                        <div class="error-message"><?php echo $error_message; ?></div>
                     <?php endif; ?>
                     <form method="POST" action="">
                         <div class="form-group">
